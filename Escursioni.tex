@@ -1,0 +1,165 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{geometry} 
+% \usepackage{newtxtext, newtxmath} % Rimosso per usare il font di default Computer Modern
+\geometry{a4paper, margin=2.5cm}
+\linespread{1.2}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{listings}
+\usepackage{sourcecodepro}
+\usepackage{booktabs}
+\usepackage[normalem]{ulem}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt} 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\footnotesize\color{gray} Escursioni}
+\fancyfoot[L]{\footnotesize\color{gray} Giovanni Veronese, Sebastiano Lorenzi}
+\fancyfoot[R]{\footnotesize\color{gray} \thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\let\oldheadrule\headrule
+\renewcommand{\headrule}{\color{gray}\oldheadrule}
+\let\oldfootrule\footrule
+\renewcommand{\footrule}{\color{gray}\oldfootrule}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftitle={Relazione Progetto: Escursioni},
+    pdfauthor={Giovanni Veronese, Sebastiano Lorenzi},
+    pdfsubject={Basi di Dati},
+    bookmarks=true,
+    bookmarksopen=true,
+    bookmarksopenlevel=2
+}
+
+\definecolor{sqlkeyword}{RGB}{0, 85, 196}
+\definecolor{sqlcomment}{RGB}{0, 128, 0}
+\definecolor{sqlstring}{RGB}{163, 21, 21}
+\definecolor{sqlback}{RGB}{250, 251, 252}
+\definecolor{sqlframe}{RGB}{224, 228, 232}
+\definecolor{codegray}{rgb}{0.3,0.3,0.3}
+
+\lstdefinestyle{sqlstyle}{
+    commentstyle=\color{sqlcomment}\itshape,
+    keywordstyle=\color{sqlkeyword}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{sqlstring},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=0pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    xleftmargin=5pt
+}
+\lstset{style=sqlstyle, language=SQL}
+
+\newtcblisting{sqlcode}[1][]{
+    colback=sqlback,
+    colframe=sqlframe,
+    arc=3pt,
+    boxrule=0.5pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=5pt,
+    before skip=20pt,
+    after skip=20pt,
+    width=0.9\textwidth,
+    center,
+    listing only,
+    listing options={style=sqlstyle, #1}
+}
+
+\begin{document}
+
+% frontespizio
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    \includegraphics[width=4.5cm]{logo_unipd.png} \\ [1cm]
+    
+    {\scshape\LARGE Università degli Studi di Padova \par}
+    \vspace{0.5cm}
+    {\Large Scuola di Scienze \par}
+    {\large Corso di Laurea in Informatica \par}
+    
+    \vspace{3.5cm}
+    
+    {\LARGE Progetto - Basi di Dati \par}
+    \vspace{0.8cm}
+    {\Huge\bfseries Escursioni \par}
+    
+    \vspace{3.5cm}
+        \begin{minipage}[t]{0.45\textwidth}
+        \begin{flushleft} \large
+            \emph{Studenti:}\\
+            \textbf{Giovanni Veronese}\\
+            \textbf{Sebastiano Lorenzi}
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+        \begin{flushright} \large
+            \emph{Docente:}\\
+            \textbf{Prof. Massimiliano de Leoni}
+        \end{flushright}
+    \end{minipage}
+    \vfill
+    {\large \textbf{Anno Accademico:} 2025-2026 \par}
+    \vspace*{1cm}
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+\section{Abstract}
+Questo progetto sviluppa una base di dati per gestire la ricerca e la partecipazione a escursioni in montagna. 
+Il principale obiettivo è poter ricercare l'itinerario su misura per sé, partendo da criteri molto diversi: se si preferisce l'aiuto di un esperto si può vedere in quali date sono previste le escursioni guidate.
+È pensato anche per essere un sistema che incrocia sentieri e punti d'interesse, perciò si può partire con dei luoghi in cui arrivare e trovare il percorso o al contrario dal percorso scoprire le tappe che si attraversano.
+I sentieri appartengono a un parco naturale che sulla sua superficie può ospitare diversi sentieri e ancor più tappe. 
+Un sentiero ha un luogo di partenza e uno di arrivo, che possono coincidere. 
+Uno dei punti d'interesse può essere un rifugio, affidato a un responsabile e con possibilità di avere un numero di posti letto per il pernottamento.
+Le persone iscritte alla lista sono identificate dal codice fiscale, possono essere normali escursionisti o delle guide, che organizzano delle escursioni guidate in una determinata data a cui possono partecipare un certo numero di persone.
+
+\section{Analisi dei requisiti}
+Questa sezione riassume i requisiti a cui deve sottostare la base di dati.
+
+\textbf{Persona.} l'essere inserita nel sistema è già una conferma di aver superato i requisiti fisici e medici. Ogni persona è identificata da
+\begin{itemize}
+    \item \textbf{codice fiscale} che distingue le persone in modo univoco 
+    \item \textbf{nome}
+    \item \textbf{cognome} 
+    \item \textbf{tipo persona} ovvero se è un escursionista o una guida
+\end{itemize}
+
+Ogni persona può partecipare a un evento organizzato come \textbf{escursionista} o come \textbf{guida}.
+
+\textbf{Guida.}
+
+\textbf{Escursionista.}
+
+
+\end{document}
