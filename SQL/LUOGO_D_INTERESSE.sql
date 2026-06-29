@@ -1,0 +1,1 @@
+INSERT INTO LUOGO_D_INTERESSE (id_tappa, tipologia) VALUES

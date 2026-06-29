@@ -1,0 +1,1 @@
+INSERT INTO CIMA (id_tappa, gruppo_montuoso) VALUES

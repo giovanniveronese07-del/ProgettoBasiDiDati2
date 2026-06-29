@@ -1,0 +1,1 @@
+INSERT INTO SENTIERO (codice, nome, difficolta, lunghezza_km, dislivello, num_tappe, nome_parco, regione_parco, id_tappa_partenza, id_tappa_arrivo) VALUES

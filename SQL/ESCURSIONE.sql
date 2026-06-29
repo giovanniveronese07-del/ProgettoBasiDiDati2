@@ -1,0 +1,1 @@
+INSERT INTO ESCURSIONE (id_escursione, nome, data_programmata, costo, codice_sentiero, posti_disponibili, cf_guida) VALUES
