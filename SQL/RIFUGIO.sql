@@ -1,1 +1,0 @@
-INSERT INTO RIFUGIO (id_tappa, posti_letto) VALUES

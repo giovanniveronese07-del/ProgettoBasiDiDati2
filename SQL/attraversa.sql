@@ -1,1 +1,0 @@
-INSERT INTO TAPPA (id_tappa, nome, altitudine) VALUES
