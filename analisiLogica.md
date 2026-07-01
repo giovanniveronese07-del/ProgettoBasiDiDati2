@@ -177,38 +177,39 @@ Le entità **Rifugio** e **Cima** ereditano l'identificatore dell'entità **Tapp
 
 Lo schema E-R ristrutturato contiene esclusivamente costrutti direttamente traducibili nel modello relazionale. Lo schema logico risultante è il seguente.
 
-- Persona(**CF**, Nome, Cognome)\
+- Persona(**CF**, Nome, Cognome)
 
-- Guida(**CF**, NumTesserino)\
+- Guida(**CF**, NumTesserino)
     - Guida.Persona → Persona.CF
 
-- Escursionista(**CF**, scadenza_certificato_medico)\
+- Escursionista(**CF**, scadenza_certificato_medico)
     - Escursionista.Persona → Persona.CF
 
-- Parco(**Nome**, **Regione**, area_km^2)\
+- Parco(**Nome**, **Regione**, area_km^2)
 
 - Sentiero(**Codice**, Nome, Difficolta, Lunghezza, tempo_percorrenza, Dislivello, NumTappe, ParcoNome, ParcoRegione, partenza, arrivo)\
     - Sentiero.(ParcoNome, ParcoRegione) → Parco.(Nome, Regione)
     - Sentiero.partenza → Tappa.id
     - Sentiero.arrivo → Tappa.id
 
-- Tappa(**ID**, Nome, altitudine_m, provincia, copertura_rete_mobile)\
+- Tappa(**ID**, Nome, altitudine_m, provincia, copertura_rete_mobile)
 
-- Rifugio(**id_Tappa**, PostiLetto, gestore, proprieta')\\
+- Rifugio(**id_Tappa**, PostiLetto, gestore, proprieta')
     - Rifugio.Tappa → Tappa.ID
+    - Rifugio.gestore → Persona.CF
 
-- Cima(**id_Tappa**, GruppoMontuoso, libro_di_vetta)\
+- Cima(**id_Tappa**, GruppoMontuoso, libro_di_vetta)
     - Cima.Tappa → Tappa.ID
 
-- Escursione(**ID**,nome, DataProgrammata, Costo, Sentiero, Guida)\\
+- Escursione(**ID**, DataProgrammata, Costo, Sentiero, Guida)
     - Escursione.Sentiero → Sentiero.Codice
     - Escursione.Guida → Guida.Persona
 
-- Attraversa(**Sentiero**, **Tappa**)\
+- Attraversa(**Sentiero**, **Tappa**)
     - Attraversa.Sentiero → Sentiero.Codice
     - Attraversa.Tappa → Tappa.ID
 
 
-- Partecipa(**Escursionista**, **Escursione**)\
+- Partecipa(**Escursionista**, **Escursione**)
     - Partecipa.Escursionista → Escursionista.Persona
     - Partecipa.Escursione → Escursione.ID
