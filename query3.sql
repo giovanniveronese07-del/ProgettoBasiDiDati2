@@ -1,5 +1,5 @@
 --QUERY 3 Elenco delle escursioni comprese in un intervallo di date, con guida e sentiero, ordinate cronologicamente
-SELECT e.id_escursione, e.data_programmata, s.nome AS sentiero, p.nome, p.cognome, e.costo
+SELECT e.id_escursione, e.data_programmata, SUBSTRING(s.nome FROM 1 FOR 30) AS sentiero, p.nome, p.cognome, e.costo
 FROM ESCURSIONE e
 JOIN SENTIERO s
 ON e.codice_sentiero = s.codice

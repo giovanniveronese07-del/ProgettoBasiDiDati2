@@ -5,11 +5,11 @@
 
 #define PG_HOST "127.0.0.1"
 #define PG_USER "postgres"
-#define PG_DB "BancaDelSangue"
+#define PG_DB "Escursioni"
 #define PG_PASS "GiovaVero04."
-#define PG_PORt 5432
+#define PG_PORT 5432
 
-#define COL_WIDTH 30
+#define COL_WIDTH 40
 
 
 void checkResult(PGresult *res, const PGconn *conn);
@@ -53,7 +53,7 @@ int main(int argc, char **argv){
     
     //per verifica in locale
     char conninfo[512];
-    sprintf(conninfo,"user=%s password=%s dbname=%s hostaddr=%s port=%d", PG_USER, PG_PASS, PG_DB, PG_HOST, PG_PORt);
+    sprintf(conninfo,"user=%s password=%s dbname=%s hostaddr=%s port=%d", PG_USER, PG_PASS, PG_DB, PG_HOST, PG_PORT);
 
 
     PGconn *conn;
@@ -126,28 +126,117 @@ void do_exit(PGconn *conn){
 //visualizza il menu'
 void printMenu(){
     printf("\n====== MENU QUERY ======\n");
-    printf("1. Gruppi sanguigni sotto soglia minima per ospedale\n");
-    printf("2. Distribuzione delle scorte per provincia\n");
-    printf("3. Visualizza il reparto che ha utilizzato piu' sacche\n");
-    printf("4. Donatori con piu' donazioni per gruppo sanguigno\n");
-    printf("5. Ospedali che hanno piu' trasferimenti in entrata che in uscita\n");
+    printf("1. Numero di escursioni organizzate da ogni guida\n");
+    printf("2. Sentieri con il massimo numero di tappe visitabili\n");
+    printf("3. Escursioni comprese in un intervallo di date\n");
+    printf("4. Escursionisti che hanno partecipato almeno N escursioni\n");
+    printf("5. Costo medio delle escursioni organizzate da ogni guida\n");
     printf("0. Esci\n");
 }
 
-//Controllare gli ospedali con il numero di sacche inferiore ad un limite imposto da utente
+//Query 1: Numero di escursioni organizzate da ogni guida
 void query1(PGconn *conn) {
+    PGresult *res;
+
+    char *query = 
+        "SELECT g.cf, p.nome, p.cognome, COUNT(e.id_escursione) AS numero_escursioni "
+        "FROM GUIDA g "
+        "JOIN PERSONA p ON g.cf = p.cf "
+        "LEFT JOIN ESCURSIONE e ON g.cf = e.cf_guida "
+        "GROUP BY g.cf, p.nome, p.cognome "
+        "ORDER BY numero_escursioni DESC; ";
+
+    res = PQexec(conn,query);
+    checkResult(res, conn);
+    
+    printResult(res);
+
+    PQclear(res);
+}
+
+//Query 2: Sentieri con il massimo numero di tappe visitabili
+void query2(PGconn *conn){
+    PGresult *res;
+
+    char *query = 
+        "DROP VIEW IF EXISTS V_NUMERO_TAPPE; "
+        "CREATE VIEW V_NUMERO_TAPPE AS "
+        "SELECT s.codice, s.nome, COUNT(a.id_tappa) AS numero_tappe "
+        "FROM SENTIERO s "
+        "JOIN attraversa a ON s.codice = a.codice_sentiero "
+        "GROUP BY s.codice, s.nome; "
+        "SELECT codice, nome, numero_tappe "
+        "FROM V_NUMERO_TAPPE "
+        "WHERE numero_tappe = ( "
+        "SELECT MAX(numero_tappe) "
+        "FROM V_NUMERO_TAPPE);";
+
+    res = PQexec(conn,query);
+    checkResult(res, conn);
+    
+    printResult(res);
+
+    PQclear(res);
+}
+
+//Query 3: Escursioni comprese in un intervallo di date
+void query3(PGconn *conn){
+    PGresult *res;
+    
+    char *query = 
+        "SELECT e.id_escursione, e.data_programmata, SUBSTRING(s.nome FROM 1 FOR 30) AS sentiero, p.nome, p.cognome, e.costo "
+        "FROM ESCURSIONE e "
+        "JOIN SENTIERO s ON e.codice_sentiero = s.codice "
+        "JOIN GUIDA g ON e.cf_guida = g.cf "
+        "JOIN PERSONA p ON g.cf = p.cf "
+        "WHERE e.data_programmata BETWEEN $1 AND $2 "
+        "ORDER BY e.data_programmata; ";
+          
+    res = PQprepare(conn, "query3", query, 2, NULL);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        printf("Errore nella preparazione della query: %s\n", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    PQclear(res);
+
+    char dataInizio[11];
+    char dataFine[11];
+
+    printf("Inserisci la data iniziale (YYYY-MM-DD): ");
+    scanf("%10s", dataInizio);
+
+    printf("Inserisci la data finale (YYYY-MM-DD): ");
+    scanf("%10s", dataFine);
+
+    const char *paramValues[2] = {dataInizio, dataFine};
+
+    res = PQexecPrepared(conn,"query3", 2, paramValues, NULL, NULL, 0);
+
+    checkResult(res, conn);
+
+    printResult(res);
+
+    PQclear(res);
+}
+
+//Query 4: Escursionisti che hanno partecipato almeno N escursioni
+void query4(PGconn *conn){
     PGresult *res;
     //creazione query
     char *query =
-        "SELECT o.nome, s.gruppo_sanguigno, s.fattore_rh, COUNT(*) AS numero_sacche "
-        "FROM SACCA s JOIN OSPEDALE o ON s.id_ospedale = o.id "
-        "WHERE s.stato_sacca = 'Disponibile' "
-        "GROUP BY o.nome, s.gruppo_sanguigno, s.fattore_rh "
-        "HAVING COUNT(*) < $1 "
-        "ORDER BY o.nome, s.gruppo_sanguigno, s.fattore_rh;";
+        "SELECT e.cf, p.nome, p.cognome, COUNT(pa.id_escursione) AS numero_escursioni "
+        "FROM ESCURSIONISTA e " 
+        "JOIN PERSONA p ON e.cf = p.cf "
+        "JOIN partecipa pa ON e.cf = pa.cf_escursionista "
+        "GROUP BY e.cf, p.nome, p.cognome "
+        "HAVING COUNT(pa.id_escursione) >= $1 "
+        "ORDER BY numero_escursioni DESC;";
 
     //preparo la query a Postgre
-    res = PQprepare(conn, "query1", query, 1, NULL);
+    res = PQprepare(conn, "query4", query, 1, NULL);
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         printf("Errore nella preparazione della query: %s\n", PQerrorMessage(conn));
@@ -159,7 +248,7 @@ void query1(PGconn *conn) {
 
     //creo il parametro
     int limite;
-    printf("Inserire la soglia minima di sacche: ");
+    printf("Inserire il numero di escursioni (scelta consigliata -> 6): ");
     scanf("%d", &limite);
 
     char limite_str[16];
@@ -168,7 +257,7 @@ void query1(PGconn *conn) {
     const char *paramValues[1] = { limite_str };
 
     //eseguo la query
-    res = PQexecPrepared(conn, "query1", 1, paramValues, NULL, NULL, 0);
+    res = PQexecPrepared(conn, "query4", 1, paramValues, NULL, NULL, 0);
 
     checkResult(res, conn);
 
@@ -177,85 +266,17 @@ void query1(PGconn *conn) {
     PQclear(res);
 }
 
-//Seleziona la quantita' di sacche per provincia divise per gruppo
-void query2(PGconn *conn){
-    PGresult *res;
-
-    char *query = 
-        "SELECT o.provincia, s.gruppo_sanguigno, fattore_rh, COUNT(*) AS num_scorte "
-        "FROM OSPEDALE o JOIN SACCA s ON o.id = s.id_ospedale "
-        "WHERE s.stato_sacca = 'Disponibile' "
-        "GROUP BY o.provincia, s.gruppo_sanguigno, fattore_rh "
-        "ORDER BY o.provincia, s.gruppo_sanguigno, fattore_rh; ";
-
-    res = PQexec(conn,query);
-    checkResult(res, conn);
-    
-    printResult(res);
-
-    PQclear(res);
-}
-
-//restituisce l'id il nome ed il reparto che ha utilizzato piu' sangue
-void query3(PGconn *conn){
-    PGresult *res;
-    
-    char *query =
-          "DROP VIEW IF EXISTS num_sacche_reparto; "
-          "CREATE VIEW num_sacche_reparto AS "
-          "SELECT o.id, o.nome, rs.reparto_destinazione, SUM(rs.quantita_sacche) AS Num_sacche "
-          "FROM RICHIESTA_SANGUE rs JOIN OSPEDALE o ON rs.id_ospedale_ricovero = o.id "
-          "GROUP BY o.id, o.nome, rs.reparto_destinazione "
-          "ORDER BY Num_sacche DESC; "
-          "SELECT id, nome, reparto_destinazione, Num_sacche "
-          "FROM num_sacche_reparto "
-          "WHERE Num_sacche = (SELECT MAX(Num_sacche) FROM num_sacche_reparto); ";
-          
-    res = PQexec(conn, query);
-    checkResult(res, conn);
-    
-    printResult(res);
-    
-    PQclear(res);
-}
-
-//trova tutti i donatori dui un determinato gruppo sanguigno che hanno donato di piu'
-void query4(PGconn *conn){
-    PGresult *res;
-    
-    char *query =
-        "DROP VIEW IF EXISTS donazioni_per_donatore; "
-        "CREATE VIEW donazioni_per_donatore AS "
-        "SELECT d.cf, d.nome, d.cognome, d.gruppo_sanguigno, d.fattore_rh, COUNT(p.id) AS numero_prelievi "
-        "FROM DONATORE d JOIN PRELIEVO p ON d.cf = p.cf_donatore "
-        "GROUP BY d.cf, d.nome, d.cognome, d.gruppo_sanguigno, d.fattore_rh; "
-	    "SELECT * "
-        "FROM donazioni_per_donatore d1 " 
-        "WHERE numero_prelievi =(SELECT MAX(d2.numero_prelievi) "
-        "FROM donazioni_per_donatore d2 "
-        "WHERE d2.gruppo_sanguigno = d1.gruppo_sanguigno "
-        "AND d2.fattore_rh = d1.fattore_rh) "
-        "ORDER BY gruppo_sanguigno, fattore_rh; ";
-          
-    res = PQexec(conn, query);
-    checkResult(res, conn);
-    
-    printResult(res);
-    
-    PQclear(res);
-}
-
-//Trovare gli ospedali che hanno piu' trasferimenti in entrata che in uscita
+//Query 5: Costo medio delle escursioni organizzate da ogni guida
 void query5(PGconn *conn){
     PGresult *res;
     
     char *query =
-        "SELECT o.id, o.nome, COUNT(t_in.id_sacca) AS sacche_ricevute, COUNT(t_out.id_sacca) AS sacche_spedite, COUNT(t_in.id_sacca) - COUNT(t_out.id_sacca) AS differenza "
-        "FROM ospedale o LEFT JOIN TRASFERIMENTO t_in ON o.id = t_in.id_ospedale_mittente "
-        "LEFT JOIN TRASFERIMENTO t_out ON o.id = t_out.id_ospedale_destinatario "
-        "GROUP BY o.id, o.nome "
-        "HAVING COUNT(t_in.id_sacca) > COUNT(t_out.id_sacca) "
-        "ORDER BY differenza DESC; ";
+        "SELECT g.cf, p.nome, p.cognome, ROUND(AVG(e.costo),2) AS costo_medio " 
+        "FROM GUIDA g "
+        "JOIN PERSONA p ON g.cf = p.cf "
+        "JOIN ESCURSIONE e ON g.cf = e.cf_guida "
+        "GROUP BY g.cf, p.nome, p.cognome "
+        "ORDER BY costo_medio DESC;";
           
     res = PQexec(conn, query);
     checkResult(res, conn);
