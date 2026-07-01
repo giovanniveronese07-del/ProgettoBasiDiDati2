@@ -54,8 +54,8 @@ CREATE TABLE RIFUGIO (
     posti_letto SMALLINT NOT NULL DEFAULT 0,
     cf_gestore CHAR(16),
     proprieta VARCHAR(100),
-    FOREIGN KEY (id_tappa) REFERENCES TAPPA(id_tappa) ON DELETE CASCADE
-);
+    FOREIGN KEY (id_tappa) REFERENCES TAPPA(id_tappa) ON DELETE CASCADE,
+    FOREIGN KEY (cf_gestore) REFERENCES PERSONA(cf));
 
 CREATE TABLE CIMA (
     id_tappa INT PRIMARY KEY,
@@ -87,7 +87,6 @@ CREATE TABLE attraversa (
 
 CREATE TABLE ESCURSIONE (
     id_escursione SERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
     data_programmata DATE NOT NULL,
     costo DECIMAL(8,2),
     codice_sentiero INTEGER NOT NULL REFERENCES SENTIERO(codice),
