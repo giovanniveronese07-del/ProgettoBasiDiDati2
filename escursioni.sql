@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS attraversa CASCADE;
 DROP TABLE IF EXISTS ESCURSIONE CASCADE;
 DROP TABLE IF EXISTS partecipa CASCADE;
 
-DROP INDEX IF EXISTS
+/*DROP INDEX IF EXISTS*/
 
 CREATE TYPE enum_regione AS ENUM ('Veneto', 'Lombardia', 'Trentino-Alto Adige', 'Friuli-Venezia Giulia');
 CREATE TYPE enum_difficolta AS ENUM ('facile', 'medio', 'difficile', 'molto difficile');
@@ -281,7 +281,7 @@ INSERT INTO PERSONA (cf, nome, cognome) VALUES
 ('NDTFRN79H14D205X', 'Matteo', 'Pellizzari'),
 ('TGVLRT91L52M312S', 'Elena', 'Vitali'),
 ('JSNFHR85M27L219P', 'Alessandro', 'Masi'),
-('RLTFFMR78P05D205W', 'Luca', 'Rizzo'),
+('RLTFMR78P05D205W', 'Luca', 'Rizzo'),
 ('GPMNSM92R64H501V', 'Giorgia', 'Giordano'),
 ('ZDRQCN81S49M312X', 'Sabrina', 'Perrone'),
 ('KTRLRR88T11L219T', 'Federico', 'Lombardo'),
