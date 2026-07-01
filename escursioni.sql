@@ -33,7 +33,7 @@ CREATE TABLE TAPPA (
 );
 
 CREATE TABLE PARCO (
-    nome VARCHAR(100),
+    nome VARCHAR(100) NOT NULL,
     regione enum_regione NOT NULL,
     superficie_km2 DECIMAL(8,2),
     PRIMARY KEY (nome, regione)
@@ -778,10 +778,10 @@ INSERT INTO PARCO (nome, regione, superficie_km2) VALUES
 ('Parco Naturale Regionale del Fiume Sile', 'Veneto', 41.52),
 ('Parco Regionale del Delta del Po', 'Veneto', 120.00),
 ('Parco Naturale Regionale delle Dolomiti d''Ampezzo', 'Veneto', 112.00),
-(NULL, 'Veneto', 18345.35),
-(NULL, 'Lombardia', 23863.65),
-(NULL, 'Trentino-Alto Adige', 13606.87),
-(NULL, 'Friuli-Venezia Giulia', 7924.36),
+('Regione Veneto', 'Veneto', 18345.35),
+('Regione Lombardia', 'Lombardia', 23863.65),
+('Regione Trentino-Alto Adige', 'Trentino-Alto Adige', 13606.87),
+('Regione Friuli-Venezia Giulia', 'Friuli-Venezia Giulia', 7924.36),
 ('Parco Naturale Paneveggio - Pale di San Martino', 'Trentino-Alto Adige', 197.11),
 ('Parco Naturale Tre Cime', 'Trentino-Alto Adige', 118.91),
 ('Parco dell''Alto Garda Bresciano', 'Lombardia', 382.69),
