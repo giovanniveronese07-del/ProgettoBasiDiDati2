@@ -29,7 +29,7 @@ CREATE TABLE TAPPA (
     nome VARCHAR(100) NOT NULL,
     altitudine_m INTEGER,
     provincia CHAR(2),
-    copertura_rete_mobile SMALLINT
+    copertura_rete_mobile BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE PARCO (
@@ -55,12 +55,12 @@ CREATE TABLE RIFUGIO (
     cf_gestore CHAR(16),
     proprieta VARCHAR(100),
     FOREIGN KEY (id_tappa) REFERENCES TAPPA(id_tappa) ON DELETE CASCADE,
-    FOREIGN KEY (cf_gestore) REFERENCES PERSONA(cf));
+    FOREIGN KEY (cf_gestore) REFERENCES PERSONA(cf)
+);
 
 CREATE TABLE CIMA (
     id_tappa INT PRIMARY KEY,
     gruppo_montuoso VARCHAR(100) NOT NULL,
-    libro_di_vetta BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (id_tappa) REFERENCES TAPPA(id_tappa) ON DELETE CASCADE
 );
 
