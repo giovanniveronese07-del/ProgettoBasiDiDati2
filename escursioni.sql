@@ -33,7 +33,7 @@ CREATE TABLE TAPPA (
 );
 
 CREATE TABLE PARCO (
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(100),
     regione enum_regione NOT NULL,
     superficie_km2 DECIMAL(8,2),
     PRIMARY KEY (nome, regione)
