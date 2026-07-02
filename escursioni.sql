@@ -2528,7 +2528,7 @@ JOIN PERSONA p ON g.cf = p.cf
 WHERE e.data_programmata BETWEEN '2026-06-13' AND '2026-12-24'
 ORDER BY e.data_programmata;
 
---QUERY 4 Escursionisti che ahanno partecipato almeno a N escursioni
+--QUERY 4 Escursionisti che hanno partecipato almeno a N escursioni
 SELECT e.cf, p.nome, p.cognome, COUNT(pa.id_escursione) AS numero_escursioni
 FROM ESCURSIONISTA e
 JOIN PERSONA p ON e.cf = p.cf
