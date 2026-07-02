@@ -1,3 +1,4 @@
+
 DROP TYPE IF EXISTS enum_regione CASCADE;
 DROP TYPE IF EXISTS enum_difficolta CASCADE;
 
@@ -554,11 +555,11 @@ INSERT INTO PERSONA (cf, nome, cognome) VALUES
 ('QRNTNT94P02M312W', 'Giovanni', 'Frasca'),
 ('TNNTNT65S48L219T', 'Francesca', 'Cavallaro'),
 ('MNTNTN83R31D205X', 'Luca', 'D’Angelo'),
-('CLTANG79P68M312X','Angelo','Colato'),
-('ARGCHR83S45H501Z','Chiara','Argento'),
-('GLIGRV02M07D205V','Gravina','Glicerina'),
-('SMRGIO89D49L219X','Samartitano','Giorgio'),
-('BLUSTF73C28D205Q','Stefano','Bulo'),
+('CLTANG79P68M312X', 'Angelo', 'Colato'),
+('ARGCHR83S45H501Z', 'Chiara', 'Argento'),
+('GLIGRV02M07D205V', 'Gravina', 'Glicerina'),
+('SMRGIO89D49L219X', 'Samartitano', 'Giorgio'),
+('BLUSTF73C28D205Q', 'Stefano', 'Bulo'),
 ('AMBSRA82C60F205U', 'Andrea', 'Ambrosi'),
 ('BNCLRA92T62L219Y', 'Chiara', 'Bianchi'),
 ('BRNFAB91R14F205Y', 'Fabio', 'Bruni'),

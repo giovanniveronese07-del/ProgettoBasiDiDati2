@@ -5,7 +5,7 @@
 
 #define PG_HOST "127.0.0.1"
 #define PG_USER "postgres"
-#define PG_DB "Escursioni"
+#define PG_DB "escursioni2"
 #define PG_PASS "GiovaVero04."
 #define PG_PORT 5432
 
